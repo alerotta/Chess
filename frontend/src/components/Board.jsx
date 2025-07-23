@@ -4,7 +4,8 @@ import { useState } from "react";
 function Board({ isFlipped }) {
 
     const [selectedSquare, setSelectedSquare] = useState(null)
-    const piecePositions = {
+    const [firstClicked, setFirstClicked] = useState(null)
+    const [piecePositions, setPiecePositions] = useState({
 
         '0-0': './assets/rook-black.png',
         '0-1': './assets/knight-black.png',
@@ -38,7 +39,36 @@ function Board({ isFlipped }) {
         '7-5': './assets/bishop.png',
         '7-6': './assets/knight.png',
         '7-7': './assets/rook.png',
-    };
+    });
+
+    const handleSquareClick = (squareId) => {
+
+        if (firstClicked == null) {
+            if (piecePositions[squareId] == null) {
+                setSelectedSquare(null)
+                return
+            }
+            if (selectedSquare === squareId) {
+                setSelectedSquare(null)
+            }
+            else {
+                setSelectedSquare(squareId)
+                setFirstClicked(squareId)
+            }
+        }
+        else {
+            setPiecePositions(prevPositions => ({
+                ...prevPositions,
+                [squareId]: prevPositions[firstClicked],
+                [firstClicked]: null,  // remove piece from source
+
+            }))
+            setSelectedSquare(null)
+            setFirstClicked(null)
+        }
+
+
+    }
 
 
 
@@ -58,11 +88,11 @@ function Board({ isFlipped }) {
                         key={squareId}
                         value={squareId}
                         selected={selectedSquare === squareId}
-                        onChange={() => setSelectedSquare(selectedSquare === squareId ? null : squareId)}
+                        onChange={() => handleSquareClick(squareId)}
                         sx={{
                             width: 60,
                             height: 60,
-                            border: '1px solid #333',
+
                             backgroundColor: isLight ? '#f0d9b5' : '#b58863',
                             '&:hover': {
                                 backgroundColor: isLight ? '#e6d0a5' : '#a57853',
@@ -76,6 +106,8 @@ function Board({ isFlipped }) {
                             minWidth: 'unset',
                             padding: 0,
                         }}
+
+
                     >
                         {pieceImage && (
                             <img
@@ -87,6 +119,7 @@ function Board({ isFlipped }) {
                                     objectFit: 'contain',
                                 }}
                             />
+
                         )}
                     </ToggleButton>
                 )
