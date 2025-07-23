@@ -1,7 +1,7 @@
 import { ToggleButton, Box } from "@mui/material";
 import { useState } from "react";
 
-function Board() {
+function Board({ isFlipped }) {
 
     const [selectedSquare, setSelectedSquare] = useState(null)
     const piecePositions = {
@@ -94,8 +94,7 @@ function Board() {
         }
 
 
-
-        return squares
+        return isFlipped ? squares.reverse() : squares
     }
 
     return (
