@@ -5,46 +5,57 @@ function Board({ isFlipped }) {
 
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [firstClicked, setFirstClicked] = useState(null)
-    const [piecePositions, setPiecePositions] = useState({
+    const [pieces, setPieces] = useState([
 
-        '0-0': './assets/rook-black.png',
-        '0-1': './assets/knight-black.png',
-        '0-2': './assets/bishop-black.png',
-        '0-3': './assets/queen-black.png',
-        '0-4': './assets/king-black.png',
-        '0-5': './assets/bishop-black.png',
-        '0-6': './assets/knight-black.png',
-        '0-7': './assets/rook-black.png',
-        '1-0': './assets/pawn-black.png',
-        '1-1': './assets/pawn-black.png',
-        '1-2': './assets/pawn-black.png',
-        '1-3': './assets/pawn-black.png',
-        '1-4': './assets/pawn-black.png',
-        '1-5': './assets/pawn-black.png',
-        '1-6': './assets/pawn-black.png',
-        '1-7': './assets/pawn-black.png',
-        '6-0': './assets/pawn.png',
-        '6-1': './assets/pawn.png',
-        '6-2': './assets/pawn.png',
-        '6-3': './assets/pawn.png',
-        '6-4': './assets/pawn.png',
-        '6-5': './assets/pawn.png',
-        '6-6': './assets/pawn.png',
-        '6-7': './assets/pawn.png',
-        '7-0': './assets/rook.png',
-        '7-1': './assets/knight.png',
-        '7-2': './assets/bishop.png',
-        '7-3': './assets/queen.png',
-        '7-4': './assets/king.png',
-        '7-5': './assets/bishop.png',
-        '7-6': './assets/knight.png',
-        '7-7': './assets/rook.png',
-    });
+        //black pieces 
+        { position: '0-0', img: './assets/rook-black.png', color: 'balck', type: 'rook' },
+        { position: '0-1', img: './assets/knight-black.png', color: 'black', type: 'knight' },
+        { position: '0-2', img: './assets/bishop-black.png', color: 'black', type: 'bishop' },
+        { position: '0-3', img: './assets/queen-black.png', color: 'black', type: 'queen' },
+        { position: '0-4', img: './assets/king-black.png', color: 'black', type: 'king' },
+        { position: '0-5', img: './assets/bishop-black.png', color: 'black', type: 'bishop' },
+        { position: '0-6', img: './assets/knight-black.png', color: 'black', type: 'knight' },
+        //black pawns
+        { position: '0-7', img: './assets/rook-black.png', color: 'black', type: 'rook' },
+        { position: '1-0', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
+        { position: '1-1', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
+        { position: '1-2', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
+        { position: '1-3', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
+        { position: '1-4', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
+        { position: '1-5', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
+        { position: '1-6', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
+        { position: '1-7', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
+        //white pawns
+        { position: '6-0', img: './assets/pawn.png', color: 'white', type: 'pawn' },
+        { position: '6-1', img: './assets/pawn.png', color: 'white', type: 'pawn' },
+        { position: '6-2', img: './assets/pawn.png', color: 'white', type: 'pawn' },
+        { position: '6-3', img: './assets/pawn.png', color: 'white', type: 'pawn' },
+        { position: '6-4', img: './assets/pawn.png', color: 'white', type: 'pawn' },
+        { position: '6-5', img: './assets/pawn.png', color: 'white', type: 'pawn' },
+        { position: '6-6', img: './assets/pawn.png', color: 'white', type: 'pawn' },
+        { position: '6-7', img: './assets/pawn.png', color: 'white', type: 'pawn' },
+        { position: '7-0', img: './assets/rook.png', color: 'white', type: 'rook' },
+        //white pieces 
+        { position: '7-1', img: './assets/knight.png', color: 'white', type: 'knight' },
+        { position: '7-2', img: './assets/bishop.png', color: 'white', type: 'bishop' },
+        { position: '7-3', img: './assets/queen.png', color: 'white', type: 'queen' },
+        { position: '7-4', img: './assets/king.png', color: 'white', type: 'king' },
+        { position: '7-5', img: './assets/bishop.png', color: 'white', type: 'bishop' },
+        { position: '7-6', img: './assets/knight.png', color: 'white', type: 'knight' },
+        { position: '7-7', img: './assets/rook.png', color: 'white', type: 'rook' },
+    ]);
+
+
+    const getPieceAtPosition = (position) => {
+        return pieces.find(piece => piece.position === position);
+    };
+
+
 
     const handleSquareClick = (squareId) => {
 
         if (firstClicked == null) {
-            if (piecePositions[squareId] == null) {
+            if (getPieceAtPosition(squareId) == null) {
                 setSelectedSquare(null)
                 return
             }
@@ -57,18 +68,16 @@ function Board({ isFlipped }) {
             }
         }
         else {
-            setPiecePositions(prevPositions => ({
-                ...prevPositions,
-                [squareId]: prevPositions[firstClicked],
-                [firstClicked]: null,  // remove piece from source
 
-            }))
+            setPieces()
             setSelectedSquare(null)
             setFirstClicked(null)
         }
 
 
     }
+
+
 
 
 
@@ -79,9 +88,9 @@ function Board({ isFlipped }) {
             for (let col = 0; col < 8; col++) {
 
                 const squareId = `${row}-${col}`;
+                const piece = getPieceAtPosition(squareId)
                 const isLight = (row + col) % 2 === 0;
 
-                const pieceImage = piecePositions[squareId];
 
                 squares.push(
                     <ToggleButton
@@ -109,9 +118,9 @@ function Board({ isFlipped }) {
 
 
                     >
-                        {pieceImage && (
+                        {piece && (
                             <img
-                                src={pieceImage}
+                                src={piece.img}
                                 alt="Piece"
                                 style={{
                                     width: '100%',
