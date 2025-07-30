@@ -55,21 +55,25 @@ function Board({ isFlipped }) {
     const handleSquareClick = (squareId) => {
 
         if (firstClicked == null) {
+
+            //check if sqaure is empty, if yes cannot be selected
             if (getPieceAtPosition(squareId) == null) {
                 setSelectedSquare(null)
                 return
             }
+            //check if sqaure is selected, if yes cannot deselect
             if (selectedSquare === squareId) {
                 setSelectedSquare(null)
             }
+            //select square
             else {
                 setSelectedSquare(squareId)
                 setFirstClicked(squareId)
             }
         }
         else {
-
-            setPieces()
+            //modify piece position
+            setPieces(prevPieces => prevPieces.map(piece => piece.position === firstClicked ? { ...piece, position: squareId } : piece))
             setSelectedSquare(null)
             setFirstClicked(null)
         }
