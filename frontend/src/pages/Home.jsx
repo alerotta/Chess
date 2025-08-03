@@ -8,8 +8,10 @@ import axios from "axios"
 function Home() {
 
     const fetchAPI = async () => {
-        const response = await axios.get("http://localhost:8080/api")
-        console.log(response.data.fruits)
+
+        const response = await axios.get("http://localhost:8080/game")
+        console.log("Success! Response:", response.data);
+
     };
 
     useEffect(() => {
