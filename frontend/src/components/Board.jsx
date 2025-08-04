@@ -3,7 +3,7 @@ import { useState } from "react";
 import axios from "axios"
 import { useEffect } from "react"
 
-function Board({ isFlipped }) {
+function Board({ isFlipped, isPlayerWhite }) {
 
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [firstClicked, setFirstClicked] = useState(null)
@@ -14,7 +14,6 @@ function Board({ isFlipped }) {
         const response = await axios.get("http://localhost:8080/game")
         const filteredPieces = response.data.flat().filter(piece => piece !== null)
         setPieces(filteredPieces)
-        console.log(filteredPieces)
     };
 
     useEffect(() => {
@@ -43,32 +42,42 @@ function Board({ isFlipped }) {
 
 
     const handleSquareClick = (squareId) => {
-
         if (firstClicked == null) {
+            const piece = getPieceAtSquareId(squareId)
 
-            //check if sqaure is empty, if yes cannot be selected
-            if (getPieceAtSquareId(squareId) == null) {
+            // If square is empty, do nothing
+            if (!piece) {
                 setSelectedSquare(null)
                 return
             }
-            //check if sqaure is selected, if yes cannot deselect
+
+            // If clicking the same selected square, deselect
             if (selectedSquare === squareId) {
                 setSelectedSquare(null)
+                return
             }
-            //select square
-            else {
+
+            // Check if it's the player's piece
+            const isPlayerPiece = (piece.color === 'w' && isPlayerWhite) ||
+                (piece.color === 'b' && !isPlayerWhite)
+
+            if (isPlayerPiece) {
                 setSelectedSquare(squareId)
                 setFirstClicked(squareId)
+            } else {
+                setSelectedSquare(null)
             }
-        }
-        else {
-            //modify piece position
-            setPieces(prevPieces => prevPieces.map(piece => piece.square === firstClicked ? { ...piece, square: squareId } : piece))
+        } else {
+
+            //ask to the server for the possible moves of that piece 
+            setPieces(prevPieces =>
+                prevPieces.map(piece =>
+                    piece.square === firstClicked ? { ...piece, square: squareId } : piece
+                )
+            );
             setSelectedSquare(null)
             setFirstClicked(null)
         }
-
-
     }
 
 
@@ -86,7 +95,7 @@ function Board({ isFlipped }) {
             7: 'h',
         }
 
-        for (let row = 0; row < 8; row++) {
+        for (let row = 7; row >= 0; row--) {
             for (let col = 0; col < 8; col++) {
 
                 const squareId = `${values[col]}${row + 1}`;
@@ -120,6 +129,7 @@ function Board({ isFlipped }) {
 
 
                     >
+
 
                         {piece && (
                             <img
