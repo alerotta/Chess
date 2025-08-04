@@ -1,54 +1,44 @@
 import { ToggleButton, Box } from "@mui/material";
 import { useState } from "react";
+import axios from "axios"
+import { useEffect } from "react"
 
 function Board({ isFlipped }) {
 
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [firstClicked, setFirstClicked] = useState(null)
-    const [pieces, setPieces] = useState([
+    const [pieces, setPieces] = useState(null)
 
-        //black pieces 
-        { position: '0-0', img: './assets/rook-black.png', color: 'balck', type: 'rook' },
-        { position: '0-1', img: './assets/knight-black.png', color: 'black', type: 'knight' },
-        { position: '0-2', img: './assets/bishop-black.png', color: 'black', type: 'bishop' },
-        { position: '0-3', img: './assets/queen-black.png', color: 'black', type: 'queen' },
-        { position: '0-4', img: './assets/king-black.png', color: 'black', type: 'king' },
-        { position: '0-5', img: './assets/bishop-black.png', color: 'black', type: 'bishop' },
-        { position: '0-6', img: './assets/knight-black.png', color: 'black', type: 'knight' },
-        //black pawns
-        { position: '0-7', img: './assets/rook-black.png', color: 'black', type: 'rook' },
-        { position: '1-0', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
-        { position: '1-1', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
-        { position: '1-2', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
-        { position: '1-3', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
-        { position: '1-4', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
-        { position: '1-5', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
-        { position: '1-6', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
-        { position: '1-7', img: './assets/pawn-black.png', color: 'black', type: 'pawn' },
-        //white pawns
-        { position: '6-0', img: './assets/pawn.png', color: 'white', type: 'pawn' },
-        { position: '6-1', img: './assets/pawn.png', color: 'white', type: 'pawn' },
-        { position: '6-2', img: './assets/pawn.png', color: 'white', type: 'pawn' },
-        { position: '6-3', img: './assets/pawn.png', color: 'white', type: 'pawn' },
-        { position: '6-4', img: './assets/pawn.png', color: 'white', type: 'pawn' },
-        { position: '6-5', img: './assets/pawn.png', color: 'white', type: 'pawn' },
-        { position: '6-6', img: './assets/pawn.png', color: 'white', type: 'pawn' },
-        { position: '6-7', img: './assets/pawn.png', color: 'white', type: 'pawn' },
-        { position: '7-0', img: './assets/rook.png', color: 'white', type: 'rook' },
-        //white pieces 
-        { position: '7-1', img: './assets/knight.png', color: 'white', type: 'knight' },
-        { position: '7-2', img: './assets/bishop.png', color: 'white', type: 'bishop' },
-        { position: '7-3', img: './assets/queen.png', color: 'white', type: 'queen' },
-        { position: '7-4', img: './assets/king.png', color: 'white', type: 'king' },
-        { position: '7-5', img: './assets/bishop.png', color: 'white', type: 'bishop' },
-        { position: '7-6', img: './assets/knight.png', color: 'white', type: 'knight' },
-        { position: '7-7', img: './assets/rook.png', color: 'white', type: 'rook' },
-    ]);
+    const fetchAPI = async () => {
 
-
-    const getPieceAtPosition = (position) => {
-        return pieces.find(piece => piece.position === position);
+        const response = await axios.get("http://localhost:8080/game")
+        const filteredPieces = response.data.flat().filter(piece => piece !== null)
+        setPieces(filteredPieces)
+        console.log(filteredPieces)
     };
+
+    useEffect(() => {
+        fetchAPI();
+    }, [])
+
+
+
+    const getPieceAtSquareId = (squareId) => {
+        if (pieces != null)
+            return pieces.find((piece) => piece.square === squareId) || null;
+    }
+
+
+
+    const getPieceIconPath = (type, color) => {
+        let base = "./assets/"
+        let ext = ".png"
+        return base + type + color + ext
+    }
+
+
+
+
 
 
 
@@ -57,7 +47,7 @@ function Board({ isFlipped }) {
         if (firstClicked == null) {
 
             //check if sqaure is empty, if yes cannot be selected
-            if (getPieceAtPosition(squareId) == null) {
+            if (getPieceAtSquareId(squareId) == null) {
                 setSelectedSquare(null)
                 return
             }
@@ -73,7 +63,7 @@ function Board({ isFlipped }) {
         }
         else {
             //modify piece position
-            setPieces(prevPieces => prevPieces.map(piece => piece.position === firstClicked ? { ...piece, position: squareId } : piece))
+            setPieces(prevPieces => prevPieces.map(piece => piece.square === firstClicked ? { ...piece, square: squareId } : piece))
             setSelectedSquare(null)
             setFirstClicked(null)
         }
@@ -82,17 +72,25 @@ function Board({ isFlipped }) {
     }
 
 
-
-
-
     const renderBoard = () => {
         const squares = [];
+
+        let values = {
+            0: 'a',
+            1: 'b',
+            2: 'c',
+            3: 'd',
+            4: 'e',
+            5: 'f',
+            6: 'g',
+            7: 'h',
+        }
 
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
 
-                const squareId = `${row}-${col}`;
-                const piece = getPieceAtPosition(squareId)
+                const squareId = `${values[col]}${row + 1}`;
+                const piece = getPieceAtSquareId(squareId)
                 const isLight = (row + col) % 2 === 0;
 
 
@@ -122,9 +120,10 @@ function Board({ isFlipped }) {
 
 
                     >
+
                         {piece && (
                             <img
-                                src={piece.img}
+                                src={getPieceIconPath(piece.type, piece.color)}
                                 alt="Piece"
                                 style={{
                                     width: '100%',
@@ -134,6 +133,10 @@ function Board({ isFlipped }) {
                             />
 
                         )}
+
+
+
+
                     </ToggleButton>
                 )
             }
@@ -142,6 +145,8 @@ function Board({ isFlipped }) {
 
         return isFlipped ? squares.reverse() : squares
     }
+
+
 
     return (
         <>
