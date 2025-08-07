@@ -10,7 +10,6 @@ function Board({ isFlipped, isPlayerWhite }) {
     const [pieces, setPieces] = useState(null)
 
     const fetchAPI = async () => {
-
         const response = await axios.get("http://localhost:8080/game")
         const filteredPieces = response.data.flat().filter(piece => piece !== null)
         setPieces(filteredPieces)
@@ -19,6 +18,27 @@ function Board({ isFlipped, isPlayerWhite }) {
     useEffect(() => {
         fetchAPI();
     }, [])
+
+    const handleMove = async (from, to) => {
+        try {
+            const response = await axios.post("http://localhost:8080/game/move", { from: from, to: to })
+            console.log(response)
+
+            setPieces(prevPieces =>
+                prevPieces.map(piece =>
+                    piece.square === from ? { ...piece, square: to } : piece
+                )
+            );
+            setSelectedSquare(null)
+            setFirstClicked(null)
+        } catch (error) {
+            // Handle network errors or other exceptions
+            console.error("Move failed:", error.response?.data?.error || error.message)
+            setSelectedSquare(null)
+            setFirstClicked(null)
+        }
+
+    }
 
 
 
@@ -68,15 +88,7 @@ function Board({ isFlipped, isPlayerWhite }) {
                 setSelectedSquare(null)
             }
         } else {
-
-            //ask to the server for the possible moves of that piece 
-            setPieces(prevPieces =>
-                prevPieces.map(piece =>
-                    piece.square === firstClicked ? { ...piece, square: squareId } : piece
-                )
-            );
-            setSelectedSquare(null)
-            setFirstClicked(null)
+            handleMove(firstClicked, squareId)
         }
     }
 
