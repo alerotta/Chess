@@ -29,10 +29,13 @@ function Board({ isFlipped, isPlayerWhite }) {
                     piece.square === from ? { ...piece, square: to } : piece
                 )
             );
+            const isCheckmate = response.data?.isCheckmate === true
+            if (isCheckmate) {
+                alert('Checkmate!');
+            }
             setSelectedSquare(null)
             setFirstClicked(null)
         } catch (error) {
-            // Handle network errors or other exceptions
             console.error("Move failed:", error.response?.data?.error || error.message)
             setSelectedSquare(null)
             setFirstClicked(null)
@@ -112,7 +115,7 @@ function Board({ isFlipped, isPlayerWhite }) {
 
                 const squareId = `${values[col]}${row + 1}`;
                 const piece = getPieceAtSquareId(squareId)
-                const isLight = (row + col) % 2 === 0;
+                const isLight = (row + col + 1) % 2 === 0;
 
 
                 squares.push(

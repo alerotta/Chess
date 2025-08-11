@@ -11,7 +11,15 @@ router.get("/", (req, res) => {
 })
 
 router.post("/move", (req, res) => {
-    res.send(chess.move(req.body))
+    const move_obj = chess.move(req.body)
+    if (chess.isCheckmate()) {
+        move_obj.isCheckmate = true
+    }
+    else {
+        move_obj.isCheckmate = false
+    }
+
+    res.send(move_obj)
 })
 
 module.exports = router
