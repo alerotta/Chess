@@ -2,24 +2,11 @@
 import { Stack } from "@mui/material"
 import { Button } from "@mui/material"
 import { Typography } from "@mui/material"
-import { useEffect } from "react"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 
 function Home() {
 
     const navigate = useNavigate()
-
-    const fetchAPI = async () => {
-
-        const response = await axios.get("http://localhost:8080/game")
-        console.log("Success! Response:", response.data);
-
-    };
-
-    useEffect(() => {
-        fetchAPI();
-    }, [])
 
     return (
         <>
