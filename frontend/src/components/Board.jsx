@@ -10,6 +10,7 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [firstClicked, setFirstClicked] = useState(null)
     const [pieces, setPieces] = useState(null)
+    const [possibleMoves, setPossibleMoves] = useState(null)
 
     useEffect(() => {
         const fetchAPI = async () => {
@@ -23,8 +24,6 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
     const handleMove = async (from, to) => {
         try {
             const response = await axios.post(`${API_URL}/game/${gameId}/move`, { from: from, to: to })
-            console.log(response)
-
             setPieces(prevPieces =>
                 prevPieces.map(piece =>
                     piece.square === from ? { ...piece, square: to } : piece
@@ -45,6 +44,24 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
     }
 
 
+    const getPossibleMoves = async (from) => {
+
+        try {
+            const response = await axios.post(`${API_URL}/game/${gameId}/possible-moves`, { square: from, verbose: true })
+            const toList = response.data.map(move => move.to);
+            setPossibleMoves(toList);
+
+        } catch (error) {
+            console.error("Move failed:", error.response?.data?.error || error.message)
+            setSelectedSquare(null)
+            setFirstClicked(null)
+        }
+
+    }
+
+
+
+
 
     const getPieceAtSquareId = (squareId) => {
         if (pieces != null)
@@ -61,6 +78,7 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
 
 
     const handleSquareClick = (squareId) => {
+        //first click
         if (firstClicked == null) {
             const piece = getPieceAtSquareId(squareId)
 
@@ -83,10 +101,12 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
             if (isPlayerPiece) {
                 setSelectedSquare(squareId)
                 setFirstClicked(squareId)
+                getPossibleMoves(squareId)
             } else {
                 setSelectedSquare(null)
             }
         } else {
+            setPossibleMoves(null)
             handleMove(firstClicked, squareId)
         }
     }
@@ -112,6 +132,7 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
                 const squareId = `${values[col]}${row + 1}`;
                 const piece = getPieceAtSquareId(squareId)
                 const isLight = (row + col + 1) % 2 === 0;
+                const isPossibleMove = possibleMoves && possibleMoves.includes(squareId);
 
 
                 squares.push(
@@ -123,25 +144,36 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
                         sx={{
                             width: 60,
                             height: 60,
-
-                            backgroundColor: isLight ? '#f0d9b5' : '#b58863',
+                            backgroundColor: isPossibleMove
+                                ? '#7ecbff' // highlight color
+                                : isLight
+                                    ? '#f0d9b5'
+                                    : '#b58863',
                             '&:hover': {
-                                backgroundColor: isLight ? '#e6d0a5' : '#a57853',
+                                backgroundColor: isPossibleMove
+                                    ? '#5bb8e6'
+                                    : isLight
+                                        ? '#e6d0a5'
+                                        : '#a57853',
                             },
                             '&.Mui-selected': {
-                                backgroundColor: isLight ? '#ffff00' : '#ddd000',
+                                backgroundColor: isPossibleMove
+                                    ? '#00bfff'
+                                    : isLight
+                                        ? '#ffff00'
+                                        : '#ddd000',
                                 '&:hover': {
-                                    backgroundColor: isLight ? '#eeee00' : '#ccc000',
+                                    backgroundColor: isPossibleMove
+                                        ? '#009acd'
+                                        : isLight
+                                            ? '#eeee00'
+                                            : '#ccc000',
                                 },
                             },
                             minWidth: 'unset',
                             padding: 0,
                         }}
-
-
                     >
-
-
                         {piece && (
                             <img
                                 src={getPieceIconPath(piece.type, piece.color)}
@@ -152,12 +184,7 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
                                     objectFit: 'contain',
                                 }}
                             />
-
                         )}
-
-
-
-
                     </ToggleButton>
                 )
             }

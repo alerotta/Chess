@@ -34,4 +34,17 @@ router.post("/:gameId/move", (req, res) => {
     res.send(move_obj)
 })
 
+router.post("/:gameId/possible-moves", (req, res) => {
+
+    const game = games[req.params.gameId]
+    if (!game) {
+        return res.status(404).json({ error: "Game not found" })
+    }
+    const square = req.body
+    console.log(square)
+    const possible_moves = game.moves(square)
+    res.send(possible_moves)
+
+})
+
 module.exports = router
