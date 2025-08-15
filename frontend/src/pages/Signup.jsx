@@ -2,6 +2,8 @@ import React, { useState } from "react"
 import { Box, TextField, Button } from "@mui/material"
 import axios from "axios"
 
+const API_URL = import.meta.env.VITE_API_URL
+
 function Signup() {
 
     const [username, setUsername] = useState("")
@@ -10,7 +12,7 @@ function Signup() {
 
     const handleSignup = async () => {
         try {
-            const response = await axios.post("http://localhost:8080/auth/signup", {
+            const response = await axios.post(`${API_URL}/auth/signup`, {
                 username: username,
                 email: email,
                 password: password

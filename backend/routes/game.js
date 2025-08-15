@@ -4,21 +4,33 @@ const { Chess } = require('chess.js')
 
 router.use(express.json());
 
-const chess = new Chess()
+const games = {}
 
-router.get("/", (req, res) => {
-    res.send(chess.board())
+router.post("/new", (req, res) => {
+    const gameId = Math.random().toString(36)
+    games[gameId] = new Chess()
+    res.json({ gameId })
 })
 
-router.post("/move", (req, res) => {
-    const move_obj = chess.move(req.body)
-    if (chess.isCheckmate()) {
-        move_obj.isCheckmate = true
+router.get("/:gameId", (req, res) => {
+    const game = games[req.params.gameId]
+    if (!game) {
+        return res.status(404).json({ error: "Game not found" })
     }
-    else {
-        move_obj.isCheckmate = false
-    }
+    res.send(game.board())
+})
 
+
+router.post("/:gameId/move", (req, res) => {
+    const game = games[req.params.gameId]
+    if (!game) {
+        return res.status(404).json({ error: "Game not found" })
+    }
+    const move_obj = game.move(req.body)
+    if (!move_obj) {
+        return res.status(400).json({ error: "Invalid move" })
+    }
+    move_obj.isCheckmate = game.isCheckmate()
     res.send(move_obj)
 })
 

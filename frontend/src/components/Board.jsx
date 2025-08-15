@@ -3,25 +3,26 @@ import { useState } from "react";
 import axios from "axios"
 import { useEffect } from "react"
 
-function Board({ isFlipped, isPlayerWhite }) {
+const API_URL = import.meta.env.VITE_API_URL
+
+function Board({ isFlipped, isPlayerWhite, gameId }) {
 
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [firstClicked, setFirstClicked] = useState(null)
     const [pieces, setPieces] = useState(null)
 
-    const fetchAPI = async () => {
-        const response = await axios.get("http://localhost:8080/game")
-        const filteredPieces = response.data.flat().filter(piece => piece !== null)
-        setPieces(filteredPieces)
-    };
-
     useEffect(() => {
+        const fetchAPI = async () => {
+            const response = await axios.get(`${API_URL}/game/${gameId}`)
+            const filteredPieces = response.data.flat().filter(piece => piece !== null)
+            setPieces(filteredPieces)
+        };
         fetchAPI();
-    }, [])
+    }, [gameId])
 
     const handleMove = async (from, to) => {
         try {
-            const response = await axios.post("http://localhost:8080/game/move", { from: from, to: to })
+            const response = await axios.post(`${API_URL}/game/${gameId}/move`, { from: from, to: to })
             console.log(response)
 
             setPieces(prevPieces =>
@@ -53,15 +54,10 @@ function Board({ isFlipped, isPlayerWhite }) {
 
 
     const getPieceIconPath = (type, color) => {
-        let base = "./assets/"
+        let base = "../assets/"
         let ext = ".png"
         return base + type + color + ext
     }
-
-
-
-
-
 
 
     const handleSquareClick = (squareId) => {
