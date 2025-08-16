@@ -23,16 +23,9 @@ function Board({ isFlipped, isPlayerWhite, gameId }) {
 
     const handleMove = async (from, to) => {
         try {
-            const response = await axios.post(`${API_URL}/game/${gameId}/move`, { from: from, to: to })
-            setPieces(prevPieces =>
-                prevPieces.map(piece =>
-                    piece.square === from ? { ...piece, square: to } : piece
-                )
-            );
-            const isCheckmate = response.data?.isCheckmate === true
-            if (isCheckmate) {
-                alert('Checkmate!');
-            }
+            const response = await axios.post(`${API_URL}/game/${gameId}/move`, { from: from, to: to, promotion: 'q' })
+            const filteredPieces = response.data.flat().filter(piece => piece !== null)
+            setPieces(filteredPieces)
             setSelectedSquare(null)
             setFirstClicked(null)
         } catch (error) {

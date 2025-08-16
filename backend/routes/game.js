@@ -27,11 +27,11 @@ router.post("/:gameId/move", (req, res) => {
         return res.status(404).json({ error: "Game not found" })
     }
     const move_obj = game.move(req.body)
+    const game_state = game.board()
     if (!move_obj) {
         return res.status(400).json({ error: "Invalid move" })
     }
-    move_obj.isCheckmate = game.isCheckmate()
-    res.send(move_obj)
+    res.send(game_state)
 })
 
 router.post("/:gameId/possible-moves", (req, res) => {
