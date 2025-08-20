@@ -51,6 +51,11 @@ router.post("/signup", async (req, res) => {
 
         res.status(201).json({ message: "User created successfully" })
     } catch (error) {
+        if (error.code === "P2002") {
+            // Unique constraint failed
+            const target = error.meta?.target?.join(", ") || "field"
+            return res.status(409).json({ message: `A user with this ${target} already exists.` })
+        }
         res.status(500).json({ error: "Error creating user" })
     }
 

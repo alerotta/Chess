@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, TextField, Button } from "@mui/material"
+import { Box, TextField, Button, Stack, Typography } from "@mui/material"
 import axios from "axios"
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -8,6 +8,7 @@ function Login() {
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [serverError, setServerError] = useState("")
 
     const handleLogin = async () => {
         try {
@@ -19,9 +20,11 @@ function Login() {
                 localStorage.setItem("token", response.data.token)
             }
         } catch (error) {
-            console.error("Login failed:", error)
+            setServerError(error.response?.data?.message || "login failed")
         }
     }
+
+    /*
 
     const testLogin = async () => {
 
@@ -35,30 +38,41 @@ function Login() {
 
 
     }
+        */
 
     return (
         <>
+
             <Box>
-                <TextField
-                    id="username"
-                    label="Username"
-                    variant="outlined"
-                    required
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
-                />
-                <TextField
-                    id="password"
-                    label="Password"
-                    type="password"
-                    variant="outlined"
-                    required
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                />
-                <Button variant="outlined" onClick={handleLogin}>Login</Button>
-                <Button variant="outlined" onClick={testLogin}>test</Button>
+                <Stack>
+                    <TextField
+                        id="username"
+                        label="Username"
+                        variant="outlined"
+                        required
+                        error={!!serverError}
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        id="password"
+                        label="Password"
+                        type="password"
+                        variant="outlined"
+                        required
+                        error={!!serverError}
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        sx={{ mb: 2 }}
+                    />
+                    {serverError && (
+                        <Typography color="error" sx={{ mb: 2 }}>{serverError}</Typography>
+                    )}
+                    <Button variant="outlined" onClick={handleLogin}>Login</Button>
+                </Stack>
             </Box>
+
         </>
     )
 }
