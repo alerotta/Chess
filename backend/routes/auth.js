@@ -2,9 +2,12 @@ const express = require("express")
 const router = express.Router()
 const { PrismaClient } = require('@prisma/client')
 const bcrypt = require('bcrypt')
+const authToken = require('../middleware/authToken')
+const jwt = require('jsonwebtoken')
+const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key"
+
 
 const prisma = new PrismaClient()
-
 
 
 router.post("/login", async (req, res) => {
@@ -21,7 +24,9 @@ router.post("/login", async (req, res) => {
             return res.status(401).json({ error: "Invalid username or password" })
         }
 
-        res.status(200).json({ message: "Login successful" })
+        const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '12h' })
+
+        res.status(200).json({ message: "Login successful", token })
     } catch (error) {
         res.status(500).json({ error: "Error logging in" })
     }
@@ -51,6 +56,9 @@ router.post("/signup", async (req, res) => {
 
 })
 
+router.get("/test-protected", authToken, async (req, res) => {
+    res.send("this is the test")
+})
 
 
 module.exports = router

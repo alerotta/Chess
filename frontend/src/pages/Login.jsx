@@ -15,10 +15,25 @@ function Login() {
                 username: username,
                 password: password
             })
-            console.log("Success! Response:", response.data)
+            if (response.data.token) {
+                localStorage.setItem("token", response.data.token)
+            }
         } catch (error) {
             console.error("Login failed:", error)
         }
+    }
+
+    const testLogin = async () => {
+
+        const token = localStorage.getItem("token")
+        const response = await axios.get(`${API_URL}/auth/test-protected`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        console.log(response)
+
+
     }
 
     return (
@@ -42,6 +57,7 @@ function Login() {
                     onChange={e => setPassword(e.target.value)}
                 />
                 <Button variant="outlined" onClick={handleLogin}>Login</Button>
+                <Button variant="outlined" onClick={testLogin}>test</Button>
             </Box>
         </>
     )
