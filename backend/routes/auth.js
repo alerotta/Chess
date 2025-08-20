@@ -16,19 +16,20 @@ router.post("/login", async (req, res) => {
     try {
         const user = await prisma.user.findUnique({ where: { username } })
         if (!user) {
-            return res.status(401).json({ error: "Invalid username or password" })
+            return res.status(401).json({ message: "Invalid username" })
         }
 
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) {
-            return res.status(401).json({ error: "Invalid username or password" })
+            return res.status(401).json({ message: "Invalid password" })
         }
+
 
         const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '12h' })
 
         res.status(200).json({ message: "Login successful", token })
     } catch (error) {
-        res.status(500).json({ error: "Error logging in" })
+        res.status(500).json({ message: "Error logging in" })
     }
 })
 
@@ -56,7 +57,7 @@ router.post("/signup", async (req, res) => {
             const target = error.meta?.target?.join(", ") || "field"
             return res.status(409).json({ message: `A user with this ${target} already exists.` })
         }
-        res.status(500).json({ error: "Error creating user" })
+        res.status(500).json({ message: "Error creating user" })
     }
 
 })
